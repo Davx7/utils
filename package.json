@@ -1,0 +1,29 @@
+{
+  "name": "@timeax/utilities",
+  "version": "1.0.0",
+  "description": "utilities",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timeax/utils.git"
+  },
+  "keywords": [
+    "utilities"
+  ],
+  "author": "David Okpako",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/timeax/utils/issues"
+  },
+  "homepage": "https://github.com/timeax/utils#readme",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "jsdom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.33"
+  }
+}
