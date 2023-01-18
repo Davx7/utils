@@ -12,7 +12,8 @@ const api = {
     hound: require('hound')
 };
 exports.Fs = {
-    files: function (path) {
+    api: api,
+    files(path) {
         const fs = api.fs;
         if (exports.Fs.isDir(path).isDirectory) {
             return fs.readdirSync(path);
@@ -21,11 +22,10 @@ exports.Fs = {
             return null;
         }
     },
-    api: api,
-    mkdir: function (path) {
+    mkdir(path) {
         api.fs.mkdirSync(path);
     },
-    write: function (path, text, func) {
+    write(path, text, func) {
         //@ts-ignore
         let method = text;
         path = cleanPath(path);
@@ -63,7 +63,7 @@ exports.Fs = {
             callback2();
         });
     },
-    copy: function (from, destination) {
+    copy(from, destination) {
         const fs = api.fs;
         if (fs.existsSync(from)) {
             const stats = exports.Fs.isDir(from);
@@ -84,7 +84,7 @@ exports.Fs = {
             }
         }
     },
-    isDir: function (path) {
+    isDir(path) {
         const fs = api.fs;
         try {
             fs.readdirSync(path);
@@ -94,7 +94,7 @@ exports.Fs = {
         }
         return { isDirectory: true, isFile: false };
     },
-    content: function (path) {
+    content(path) {
         path = cleanPath(path);
         try {
             return api.fs.readFileSync(path, 'utf-8');
@@ -103,7 +103,7 @@ exports.Fs = {
             return undefined;
         }
     },
-    name: function (link, ext) {
+    name(link, ext) {
         const path = api.path;
         var file = '';
         if (ext !== undefined) {
@@ -123,7 +123,7 @@ exports.Fs = {
     basedir(link) {
         return api.path.basename(exports.Fs.dirname(link));
     },
-    stats: function (path) {
+    stats(path) {
         try {
             const stats = api.fs.statSync(path);
             return stats;
@@ -132,7 +132,7 @@ exports.Fs = {
             return null;
         }
     },
-    exists: function (path) {
+    exists(path) {
         return api.fs.existsSync(path);
     },
     watchFile: (link, caller) => {
@@ -167,10 +167,10 @@ exports.Fs = {
             });
         }
     },
-    unwatchFile: function (link) {
+    unwatchFile(link) {
         api.fs.unwatchFile(link);
     },
-    join: function (path1, path2) {
+    join(path1, path2) {
         return api.path.join(path1, path2);
     },
     deleteFile(path) {
