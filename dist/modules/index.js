@@ -261,10 +261,10 @@ exports.Fs = {
         // ============
         return result;
     },
-    createDirs(path, base = path) {
+    createDirs(path, base = exports.Fs.formatPath(path)) {
         let dirname = api.path.dirname(path);
         if (api.fs.existsSync(dirname)) {
-            if (base.endsWith('/'))
+            if (!api.fs.existsSync(base) && base.endsWith('/'))
                 api.fs.mkdirSync(base);
             return true;
         }
