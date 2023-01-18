@@ -37,7 +37,7 @@ export declare const Fs: {
     };
     watch2(path: string, options?: chokidar.WatchOptions): chokidar.FSWatcher;
     createPath(mainPath: string, item: string): string;
-    createDirs(path: string): boolean;
+    createDirs(path: string, base?: string): boolean;
     samePath(args1: string, args2: string): boolean;
     formatPath(path: any, slashType?: '/' | '\\', replaceWhiteSpaceSym?: boolean): any;
 };
