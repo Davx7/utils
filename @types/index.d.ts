@@ -26,3 +26,5 @@ export declare function timer(callback: (timer?: number) => any, timer?: number,
     stop: () => void;
 };
 export declare function wait(callback: (...props: any) => boolean, ...args: any[]): Promise<any>;
+export { Fs } from './modules';
+export { Default } from './modules/default';

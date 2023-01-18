@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wait = exports.timer = exports.isEmpty = exports.getObj = exports.copyOBJ = exports.parseBoolean = exports.isUndefined = exports.isFalse = exports.avoid = exports.is = exports.watchPropChange = void 0;
+exports.Default = exports.Fs = exports.wait = exports.timer = exports.isEmpty = exports.getObj = exports.copyOBJ = exports.parseBoolean = exports.isUndefined = exports.isFalse = exports.avoid = exports.is = exports.watchPropChange = void 0;
 const jsdom_1 = require("jsdom");
 function watchPropChange(key, callback, value) {
     let watched = key[0][key[1]];
@@ -160,3 +160,7 @@ async function wait(callback, ...args) {
     });
 }
 exports.wait = wait;
+var modules_1 = require("./modules");
+Object.defineProperty(exports, "Fs", { enumerable: true, get: function () { return modules_1.Fs; } });
+var default_1 = require("./modules/default");
+Object.defineProperty(exports, "Default", { enumerable: true, get: function () { return default_1.Default; } });

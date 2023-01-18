@@ -39,6 +39,7 @@ export declare const Fs: {
     createPath(mainPath: string, item: string): string;
     createDirs(path: string): boolean;
     samePath(args1: string, args2: string): boolean;
+    formatPath(path: any, slashType?: '/' | '\\', replaceWhiteSpaceSym?: boolean): any;
 };
 export declare type houndId = 'create' | 'change' | 'delete';
 interface Hound {

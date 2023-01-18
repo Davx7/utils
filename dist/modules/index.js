@@ -270,6 +270,14 @@ exports.Fs = {
     },
     samePath(args1, args2) {
         return cleanPath(args1) === cleanPath(args2);
+    },
+    formatPath(path, slashType = '/', replaceWhiteSpaceSym = true) {
+        let regex = new RegExp(slashType == '/' ? '\\\\' : '/', 'g');
+        path = path.replace('file:///', '');
+        path = path.replace(regex, slashType);
+        if (replaceWhiteSpaceSym)
+            path = path.replace(/%20/g, ' ');
+        return path;
     }
 };
 function cleanPath(link, type) {
