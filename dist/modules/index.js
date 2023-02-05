@@ -262,14 +262,24 @@ exports.Fs = {
         return result;
     },
     createDirs(path, base = exports.Fs.formatPath(path)) {
-        let dirname = api.path.dirname(path);
-        if (api.fs.existsSync(dirname)) {
-            if (!api.fs.existsSync(base) && base.endsWith('/'))
-                api.fs.mkdirSync(base);
-            return true;
+        base = exports.Fs.formatPath(base);
+        while (!exports.Fs.exists(base)) {
+            let dirname = exports.Fs.dirname(base);
+            if (exports.Fs.exists(dirname)) {
+                if (!exports.Fs.exists(base)) {
+                    if (ignore) exports.Fs.mkdir(base);
+                    else {
+                        if (base.endsWith('/')) exports.Fs.mkdir(base);
+                        break;
+                    }
+                }
+            } else {
+                exports.Fs.createDirs(dirname, true);
+                // Fs.mkdir(dirname);
+            }
         }
-        exports.Fs.createDirs(dirname, path);
-        api.fs.mkdirSync(dirname);
+
+        return true;
     },
     samePath(args1, args2) {
         return cleanPath(args1) === cleanPath(args2);
