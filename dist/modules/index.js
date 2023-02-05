@@ -261,7 +261,7 @@ exports.Fs = {
         // ============
         return result;
     },
-    createDirs(path, base = exports.Fs.formatPath(path)) {
+    createDirs(base, ignore = false) {
         base = exports.Fs.formatPath(base);
         while (!exports.Fs.exists(base)) {
             let dirname = exports.Fs.dirname(base);
