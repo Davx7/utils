@@ -3,15 +3,29 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import chokidar from 'chokidar';
-interface Obj<T = any> {
+interface ValidationObj<T = any> {
     prop: T;
-    get null(): T extends null ? true : T extends undefined ? true : false;
     readonly array: boolean;
+    /**
+         *
+         * @param param - element to be compared
+         * @param strict - boolean - set to true to compare elements of an object. default is false
+         * @returns boolean
+         */
     equal(param: any, strict?: boolean): boolean;
     uppercase(): boolean;
 }
 export declare namespace util {
-    export function is<T>(prop: T): Obj<T>;
+    /**
+     * Function for validating variables
+     */
+    export function is<T>(prop: T): ValidationObj<T>;
+    /**
+     * Ckecks whether or not the parameter is `null` or `undefined`
+     * @param prop
+     * @returns boolean
+     */
+    export function unset(prop: any): prop is undefined;
     /**
      *
      * @param prop object
@@ -62,7 +76,7 @@ export declare namespace Fs {
      * Returns an Array of all direct files and folders within this path
      * @param path path to folder
      */
-    export function files(path: string): string[] | undefined;
+    export function files(path: string, absolute?: boolean): string[] | undefined;
     export function isDir(path: string): boolean;
     export function stats(path: string): fs.Stats | undefined;
     export function name(filepath: string, ext?: string): string;

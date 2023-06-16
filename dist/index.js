@@ -35,21 +35,27 @@ var util;
 (function (util) {
     const isObj = {
         prop: null,
-        get null() {
-            return this.prop === undefined || this.prop === null;
-        },
         get array() {
             return Array.isArray(this.prop);
         },
+        /**
+         *
+         * @param param - element to be compared
+         * @param strict - boolean - set to true to compare elements of an object. default is false
+         * @returns boolean
+         */
         equal(param, strict) {
             const prop = this.prop;
             if (!strict)
                 return param === prop;
             //---
-            if (Array.isArray(param) && Array.isArray(prop)) {
-                return prop.every((item, i) => is(item).equal(param[i], strict));
+            if (Array.isArray(prop)) {
+                if (Array.isArray(param)) {
+                    return prop.every((item, i) => is(item).equal(param[i], strict));
+                }
+                return false;
             }
-            if (typeof param === 'object' && param && typeof prop == 'object' && prop) {
+            if (typeof param === 'object' && param && typeof prop == 'object' && prop && !(0, types_1.isProxy)(prop)) {
                 for (const key in param) {
                     if (Object.prototype.hasOwnProperty.call(param, key)) {
                         if (!(key in prop) || !is(param[key]).equal(prop[key]))
@@ -63,11 +69,23 @@ var util;
             return /^[A-Z]*$/.test(this.prop.charAt(0));
         },
     };
+    /**
+     * Function for validating variables
+     */
     function is(prop) {
         isObj.prop = prop;
         return isObj;
     }
     util.is = is;
+    /**
+     * Ckecks whether or not the parameter is `null` or `undefined`
+     * @param prop
+     * @returns boolean
+     */
+    function unset(prop) {
+        return prop === null || prop === undefined;
+    }
+    util.unset = unset;
     /**
      *
      * @param prop object
@@ -104,7 +122,7 @@ var util;
      * @param args
      */
     function isEmpty(args) {
-        if (is(args).null)
+        if (unset(args))
             return true;
         try {
             if (typeof args == 'object') {
@@ -169,7 +187,7 @@ var Fs;
      * @returns a clean path
      */
     function format(path, options) {
-        let slash = (options === null || options === void 0 ? void 0 : options.slashType) || '/', rwss = util.is(options === null || options === void 0 ? void 0 : options.replaceWhitespaceSym).null ? false : options === null || options === void 0 ? void 0 : options.replaceWhitespaceSym;
+        let slash = (options === null || options === void 0 ? void 0 : options.slashType) || '/', rwss = util.unset(options === null || options === void 0 ? void 0 : options.replaceWhitespaceSym) ? false : options === null || options === void 0 ? void 0 : options.replaceWhitespaceSym;
         //---
         let regex = new RegExp(slash == '/' ? '\\\\' : '/', 'g');
         path = path.replace('file:///', '');
@@ -183,11 +201,14 @@ var Fs;
      * Returns an Array of all direct files and folders within this path
      * @param path path to folder
      */
-    function files(path) {
+    function files(path, absolute) {
         if (!path)
             return;
         try {
-            return fs.readdirSync(path);
+            let files = fs.readdirSync(path);
+            if (absolute)
+                return files.map(item => format(join(path, item)));
+            return files;
         }
         catch (e) {
             return;

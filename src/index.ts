@@ -3,32 +3,43 @@ import * as path from 'path';
 import chokidar from 'chokidar';
 import { isProxy } from 'util/types';
 
-interface Obj<T = any> {
+interface ValidationObj<T = any> {
     prop: T;
-    get null(): T extends null ? true : T extends undefined ? true : false;
     readonly array: boolean;
+    /**
+         * 
+         * @param param - element to be compared
+         * @param strict - boolean - set to true to compare elements of an object. default is false
+         * @returns boolean
+         */
     equal(param: any, strict?: boolean): boolean;
     uppercase(): boolean
 }
 
 export namespace util {
-    const isObj: Obj = {
+    const isObj: ValidationObj = {
         prop: null,
-        get null() {
-            return this.prop === undefined || this.prop === null;
-        },
         get array() {
             return Array.isArray(this.prop);
         },
+        /**
+         * 
+         * @param param - element to be compared
+         * @param strict - boolean - set to true to compare elements of an object. default is false
+         * @returns boolean
+         */
         equal(param: any, strict?: boolean): boolean {
             const prop = this.prop;
             if (!strict) return param === prop;
             //---
-            if (Array.isArray(param) && Array.isArray(prop)) {
-                return prop.every((item, i) => is(item).equal(param[i], strict))
+            if (Array.isArray(prop)) {
+                if (Array.isArray(param)) {
+                    return prop.every((item, i) => is(item).equal(param[i], strict))
+                }
+                return false;
             }
 
-            if (typeof param === 'object' && param && typeof prop == 'object' && prop) {
+            if (typeof param === 'object' && param && typeof prop == 'object' && prop && !isProxy(prop)) {
                 for (const key in param) {
                     if (Object.prototype.hasOwnProperty.call(param, key)) {
                         if (!(key in prop) || !is(param[key]).equal(prop[key])) return false;
@@ -42,10 +53,21 @@ export namespace util {
             return /^[A-Z]*$/.test((this.prop as string).charAt(0))
         },
     }
-
-    export function is<T>(prop: T): Obj<T> {
+    /**
+     * Function for validating variables 
+     */
+    export function is<T>(prop: T): ValidationObj<T> {
         isObj.prop = prop;
         return isObj;
+    }
+
+    /**
+     * Ckecks whether or not the parameter is `null` or `undefined`
+     * @param prop 
+     * @returns boolean
+     */
+    export function unset(prop: any): prop is undefined {
+        return prop === null || prop === undefined;
     }
 
     /**
@@ -80,7 +102,7 @@ export namespace util {
      * @param args 
      */
     export function isEmpty<T>(args: T) {
-        if (is(args).null) return true;
+        if (unset(args)) return true;
         try {
             if (typeof args == 'object') {
                 if (Array.isArray(args)) return args.length === 0;
@@ -150,7 +172,7 @@ export namespace Fs {
      * @returns a clean path
      */
     export function format(path: string, options?: FormatOptions) {
-        let slash = options?.slashType || '/', rwss = util.is(options?.replaceWhitespaceSym).null ? false : options?.replaceWhitespaceSym;
+        let slash = options?.slashType || '/', rwss = util.unset(options?.replaceWhitespaceSym) ? false : options?.replaceWhitespaceSym;
         //---
         let regex = new RegExp(slash == '/' ? '\\\\' : '/', 'g');
         path = path.replace('file:///', '');
@@ -163,10 +185,12 @@ export namespace Fs {
      * Returns an Array of all direct files and folders within this path
      * @param path path to folder
      */
-    export function files(path: string) {
+    export function files(path: string, absolute?: boolean) {
         if (!path) return;
         try {
-            return fs.readdirSync(path);
+            let files = fs.readdirSync(path);
+            if (absolute) return files.map(item => format(join(path, item)));
+            return files;
         } catch (e) {
             return;
         }
