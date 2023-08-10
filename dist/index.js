@@ -318,6 +318,11 @@ var Fs;
         fs.writeFile(path, text, method);
     }
     Fs.write = write;
+    function writeSync(path, data = '') {
+        path = format(path);
+        fs.writeFileSync(path, data);
+    }
+    Fs.writeSync = writeSync;
     function watch(path, options) {
         return chokidar_1.default.watch(path, options);
     }
@@ -345,42 +350,7 @@ var Fs;
     }
     Fs.deleteFolder = deleteFolder;
     function createRel(basePath, path) {
-        var result = '';
-        // Strip off the other directories from where the files share a place of storage
-        basePath = format(basePath);
-        path = format(path);
-        const arr1 = basePath.split('\\');
-        const arr2 = path.split('\\');
-        const arr3 = basePath.split('\\');
-        const arr4 = path.split('\\');
-        var size = arr1.length < arr2.length ? arr2.length : arr1.length;
-        // ===========
-        for (let i = 0; i < size; i++) {
-            var temp1 = arr3[i];
-            var temp2 = arr4[i];
-            if (temp1 === temp2) {
-                arr2.shift();
-                arr1.shift();
-            }
-            else
-                break;
-        }
-        let len = arr1.length;
-        let dots = '';
-        let pathB = arr2.join('/');
-        if (len > 1) {
-            // console.log(len);
-            const size = len - 1;
-            for (let i = 0; i < size; i++) {
-                dots += '../';
-            }
-            result = dots + pathB;
-        }
-        else {
-            result = pathB;
-        }
-        // ============
-        return result;
+        return Fs.api.path.relative(basePath, path);
     }
     Fs.createRel = createRel;
     /**
@@ -413,8 +383,10 @@ var Fs;
                 createPath(dirname, options);
             }
         }
-        if ('content' in options && !options.ignore)
-            write(base, options.content, options.callack);
+        if (options.content && !options.ignore)
+            options.callack
+                ? write(base, options.content, options.callack)
+                : writeSync(base, options.content);
         return exists(base);
     }
     Fs.createPath = createPath;
@@ -479,3 +451,36 @@ class Default {
     }
 }
 exports.Default = Default;
+// var result = '';
+// // Strip off the other directories from where the files share a place of storage
+// basePath = format(basePath);
+// path = format(path);
+// const arr1 = basePath.split('/');
+// const arr2 = path.split('/');
+// const arr3 = basePath.split('/');
+// const arr4 = path.split('/');
+// var size = arr1.length < arr2.length ? arr2.length : arr1.length;
+// // ===========
+// for (let i = 0; i < size; i++) {
+//     var temp1 = arr3[i];
+//     var temp2 = arr4[i];
+//     if (temp1 === temp2) {
+//         arr2.shift();
+//         arr1.shift();
+//     }
+//     else break;
+// }
+// let len = arr1.length;
+// let dots = '';
+// let pathB = arr2.join('/');
+// if (len > 1) {
+//     // console.log(len);
+//     const size = len - 1;
+//     for (let i = 0; i < size; i++) {
+//         dots += '../';
+//     }
+//     result = dots + pathB;
+// }
+// else result = pathB;
+// // ============
+// return result;

@@ -49,9 +49,9 @@ export declare namespace util {
      */
     export function getObj<T>(json: string): T;
     type Avoid<T> = {
-        then<E>(callback: <E>(err: undefined, value: T) => E | void): E | undefined;
+        then<E>(callback: <E>(err: undefined, value: T) => void): E | undefined;
     } | {
-        then<E>(callback: <E>(err: Error, value: undefined) => E | void): E | undefined;
+        then<E>(callback: <E>(err: Error, value: undefined) => void): void;
     };
     export function avoid<T extends any>(e: () => T): Avoid<T>;
     export {};
@@ -93,6 +93,7 @@ export declare namespace Fs {
     export function mkdir(path: string): boolean;
     type WriteCallback = (err: any) => void;
     export function write(path: string, data?: string | WriteCallback, callback?: WriteCallback): void;
+    export function writeSync(path: string, data?: any): void;
     export function watch(path: string | string[], options?: chokidar.WatchOptions): chokidar.FSWatcher;
     export function deleteFile(path: string): void;
     export function deleteFolder(link: string): void;

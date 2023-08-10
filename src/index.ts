@@ -129,9 +129,9 @@ export namespace util {
     }
 
     type Avoid<T> = {
-        then<E>(callback: <E> (err: undefined, value: T) => E | void): E | undefined
+        then<E>(callback: <E> (err: undefined, value: T) => void): E | undefined
     } | {
-        then<E>(callback: <E> (err: Error, value: undefined) => E | void): E | undefined
+        then<E>(callback: <E> (err: Error, value: undefined) => void): E | undefined
     }
 
     export function avoid<T extends any>(e: () => T): Avoid<T> {
@@ -292,6 +292,11 @@ export namespace Fs {
         fs.writeFile(path, text, method)
     }
 
+    export function writeSync(path: string, data: any = '') {
+        path = format(path);
+        fs.writeFileSync(path, data);
+    }
+
     export function watch(path: string | string[], options?: chokidar.WatchOptions) {
         return chokidar.watch(path, options)
     }
@@ -315,42 +320,9 @@ export namespace Fs {
     }
 
     export function createRel(basePath: string, path: string) {
-        var result = '';
-        // Strip off the other directories from where the files share a place of storage
-        basePath = format(basePath);
-        path = format(path);
-        const arr1 = basePath.split('\\');
-        const arr2 = path.split('\\');
-        const arr3 = basePath.split('\\');
-        const arr4 = path.split('\\');
-        var size = arr1.length < arr2.length ? arr2.length : arr1.length;
-        // ===========
-        for (let i = 0; i < size; i++) {
-            var temp1 = arr3[i];
-            var temp2 = arr4[i];
-            if (temp1 === temp2) {
-                arr2.shift();
-                arr1.shift();
-            }
-            else break;
-        }
-        let len = arr1.length;
-        let dots = '';
-        let pathB = arr2.join('/');
-        if (len > 1) {
-            // console.log(len);
-            const size = len - 1;
-            for (let i = 0; i < size; i++) {
-                dots += '../';
-            }
-            result = dots + pathB;
-        }
-        else {
-            result = pathB;
-        }
-        // ============
-        return result;
+        return api.path.relative(basePath, path);
     }
+
     interface PathOptions {
         content?: string;
         callack?(err: any): void
@@ -384,7 +356,9 @@ export namespace Fs {
             }
         }
 
-        if ('content' in options && !options.ignore) write(base, options.content, options.callack);
+        if (options.content && !options.ignore) options.callack
+            ? write(base, options.content, options.callack)
+            : writeSync(base, options.content);
 
         return exists(base);
     }
@@ -451,3 +425,39 @@ export class Default {
         throw err;
     }
 }
+
+
+ // var result = '';
+        // // Strip off the other directories from where the files share a place of storage
+        // basePath = format(basePath);
+        // path = format(path);
+        // const arr1 = basePath.split('/');
+        // const arr2 = path.split('/');
+        // const arr3 = basePath.split('/');
+        // const arr4 = path.split('/');
+        // var size = arr1.length < arr2.length ? arr2.length : arr1.length;
+        // // ===========
+        // for (let i = 0; i < size; i++) {
+        //     var temp1 = arr3[i];
+        //     var temp2 = arr4[i];
+        //     if (temp1 === temp2) {
+        //         arr2.shift();
+        //         arr1.shift();
+        //     }
+        //     else break;
+        // }
+        // let len = arr1.length;
+        // let dots = '';
+        // let pathB = arr2.join('/');
+        // if (len > 1) {
+        //     // console.log(len);
+        //     const size = len - 1;
+        //     for (let i = 0; i < size; i++) {
+        //         dots += '../';
+        //     }
+        //     result = dots + pathB;
+        // }
+        // else result = pathB;
+
+        // // ============
+        // return result;
