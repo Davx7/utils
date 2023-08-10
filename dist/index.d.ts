@@ -51,7 +51,7 @@ export declare namespace util {
     type Avoid<T> = {
         then<E>(callback: <E>(err: undefined, value: T) => void): E | undefined;
     } | {
-        then<E>(callback: <E>(err: Error, value: undefined) => void): void;
+        then<E>(callback: <E>(err: Error, value: undefined) => void): E | undefined;
     };
     export function avoid<T extends any>(e: () => T): Avoid<T>;
     export {};
